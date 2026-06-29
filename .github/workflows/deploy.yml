@@ -1,31 +1,45 @@
-name: Deploy with Secrets
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Replace placeholders with secrets
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Replace secrets
       run: |
-        find . -name "*.php" -type f -exec sed -i "s|{{PAYMENT_SERVER_URL}}|${{ secrets.PAYMENT_SERVER_URL }}|g" {} +
-        find . -name "*.php" -type f -exec sed -i "s|{{LICENSE_SERVER_URL}}|${{ secrets.LICENSE_SERVER_URL }}|g" {} +
-        find . -name "*.php" -type f -exec sed -i "s|{{WEBHOOK_URL}}|${{ secrets.WEBHOOK_URL }}|g" {} +
-        find . -name "*.php" -type f -exec sed -i "s|{{SECRET_TOKEN}}|${{ secrets.SECRET_TOKEN }}|g" {} +
-    
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
+        if [ -f "api/create-payment.php" ]; then
+          sed -i "s|{{PAYMENT_SERVER_URL}}|${{ secrets.PAYMENT_SERVER_URL }}|g" api/create-payment.php
+          sed -i "s|{{SECRET_TOKEN}}|${{ secrets.SECRET_TOKEN }}|g" api/create-payment.php
+        fi
+        if [ -f "api/verify.php" ]; then
+          sed -i "s|{{LICENSE_SERVER_URL}}|${{ secrets.LICENSE_SERVER_URL }}|g" api/verify.php
+          sed -i "s|{{SECRET_TOKEN}}|${{ secrets.SECRET_TOKEN }}|g" api/verify.php
+        fi
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: gh-pages
-        force_orphan: true
-        exclude_assets: '.github,.git'
+        path: '.'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
