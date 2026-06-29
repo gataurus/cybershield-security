@@ -3,25 +3,26 @@ name: Deploy with Secrets
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Ручной запуск
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Replace placeholders with secrets
       run: |
-        # Заменяем плейсхолдеры на реальные значения из Secrets
         find . -name "*.php" -type f -exec sed -i "s|{{PAYMENT_SERVER_URL}}|${{ secrets.PAYMENT_SERVER_URL }}|g" {} +
         find . -name "*.php" -type f -exec sed -i "s|{{LICENSE_SERVER_URL}}|${{ secrets.LICENSE_SERVER_URL }}|g" {} +
         find . -name "*.php" -type f -exec sed -i "s|{{WEBHOOK_URL}}|${{ secrets.WEBHOOK_URL }}|g" {} +
         find . -name "*.php" -type f -exec sed -i "s|{{SECRET_TOKEN}}|${{ secrets.SECRET_TOKEN }}|g" {} +
-        
+    
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./
