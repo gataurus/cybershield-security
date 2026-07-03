@@ -47,14 +47,6 @@
         .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; transition: all 0.15s; }
         .lang-option:hover { background: rgba(0, 224, 72, 0.05); color: var(--text); }
         .lang-option.active { color: var(--green); font-weight: 700; background: rgba(0, 224, 72, 0.08); }
-        .response-time { 
-            display: flex; align-items: center; gap: 8px; 
-            background: rgba(0, 192, 232, 0.06); border: 1px solid rgba(0, 192, 232, 0.15);
-            border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 24px;
-            font-size: 0.85rem; color: var(--text-secondary);
-        }
-        .response-time-icon { font-size: 1.2rem; }
-        .response-time strong { color: var(--blue); }
     </style>
 </head>
 <body>
@@ -64,11 +56,6 @@
 <div class="doc-page">
     <h1 data-i18n="contact_title">Контакты</h1>
     <p data-i18n="contact_desc">Есть вопросы, предложения или нужна помощь? Заполните форму — мы ответим в течение 48 часов.</p>
-    
-    <div class="response-time">
-        <span class="response-time-icon">💬</span>
-        <span data-i18n-html="contact_response_time"><strong>Время ответа:</strong> до 48 часов</span>
-    </div>
     
     <form id="contact-form" onsubmit="return submitForm(event)">
         <div class="form-group">
@@ -136,12 +123,6 @@ var I18n = {
                 el.textContent = ContactTranslations[lang][key];
             }
         });
-        document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
-            var key = el.getAttribute('data-i18n-html');
-            if (ContactTranslations[lang] && ContactTranslations[lang][key]) {
-                el.innerHTML = ContactTranslations[lang][key];
-            }
-        });
         document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
             var key = el.getAttribute('data-i18n-placeholder');
             if (ContactTranslations[lang] && ContactTranslations[lang][key]) {
@@ -194,7 +175,6 @@ var ContactTranslations = {
     ru: {
         contact_title: 'Контакты',
         contact_desc: 'Есть вопросы, предложения или нужна помощь? Заполните форму — мы ответим в течение 48 часов.',
-        contact_response_time: '<strong>Время ответа:</strong> до 48 часов',
         contact_name: 'Имя',
         contact_name_placeholder: 'Ваше имя',
         contact_email: 'Email *',
@@ -211,7 +191,6 @@ var ContactTranslations = {
     en: {
         contact_title: 'Contact',
         contact_desc: 'Have questions or need help? Fill out the form — we\'ll respond within 48 hours.',
-        contact_response_time: '<strong>Response time:</strong> up to 48 hours',
         contact_name: 'Name',
         contact_name_placeholder: 'Your name',
         contact_email: 'Email *',
@@ -228,7 +207,6 @@ var ContactTranslations = {
     de: {
         contact_title: 'Kontakt',
         contact_desc: 'Haben Sie Fragen? Füllen Sie das Formular aus — wir antworten innerhalb von 48 Stunden.',
-        contact_response_time: '<strong>Antwortzeit:</strong> bis zu 48 Stunden',
         contact_name: 'Name',
         contact_name_placeholder: 'Ihr Name',
         contact_email: 'Email *',
@@ -275,8 +253,7 @@ async function submitForm(e) {
         honeypot: form.honeypot.value
     };
     
-    var lang = I18n.current;
-    btn.textContent = lang === 'ru' ? '⏳ Отправка...' : (lang === 'de' ? '⏳ Senden...' : '⏳ Sending...');
+    btn.textContent = '⏳ Отправка...';
     btn.disabled = true;
     
     try {
@@ -289,13 +266,13 @@ async function submitForm(e) {
             form.style.display = 'none';
             success.style.display = 'block';
         } else {
-            alert(lang === 'ru' ? 'Ошибка отправки. Попробуйте позже.' : 'Error sending. Please try again.');
+            alert('Ошибка отправки. Попробуйте позже.');
         }
     } catch (err) {
-        alert(lang === 'ru' ? 'Ошибка соединения.' : 'Connection error.');
+        alert('Ошибка соединения.');
     }
     
-    btn.textContent = ContactTranslations[lang].contact_send || 'Send Message';
+    btn.textContent = ContactTranslations[I18n.current].contact_send || 'Send Message';
     btn.disabled = false;
     return false;
 }
