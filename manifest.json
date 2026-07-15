@@ -1,8 +1,8 @@
 {
-    "name": "Cyber Security PRO",
-    "short_name": "Cyber Sec PRO",
+    "name": "CyberShield Security",
+    "short_name": "CyberShield Sec",
     "description": "Комплексная защита WordPress от ботов и атак",
-    "start_url": "/cyber-security/",
+    "start_url": "/cybershield-security/",
     "display": "browser",
     "background_color": "#0f1117",
     "theme_color": "#00e048",
